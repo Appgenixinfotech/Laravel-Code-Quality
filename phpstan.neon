@@ -3,6 +3,10 @@ parameters:
     paths:
         - src
         - tests
+        - app
+        - config
+        - database
+        - routes
     excludePaths:
         - vendor
         - cache

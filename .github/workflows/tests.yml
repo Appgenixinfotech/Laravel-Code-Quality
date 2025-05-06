@@ -32,6 +32,12 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
+    - name: Copy .env.example
+      run: cp .env.example .env
+
+    - name: Generate APP_KEY
+      run: php artisan key:generate
+
     - name: Run test suite
       run: vendor/bin/phpunit --coverage-clover=coverage.xml
 
