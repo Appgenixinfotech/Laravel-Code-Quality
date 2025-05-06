@@ -42,7 +42,11 @@ jobs:
         OUTPUT=$(vendor/bin/phpcbf || true)
         echo "$OUTPUT"
         if echo "$OUTPUT" | grep -q "ERRORS WERE FIXED"; then
-          echo "::warning file=phpcbf::Some code style issues were automatically fixed."
+          echo "::warning::Some code style issues were automatically fixed by PHPCBF."
+          echo "### 🧹 PHPCBF Auto-Fix Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
         fi
 
     - name: Fix code style with PHP-CS-Fixer
@@ -51,7 +55,11 @@ jobs:
         OUTPUT=$(vendor/bin/php-cs-fixer fix --dry-run --diff || true)
         echo "$OUTPUT"
         if echo "$OUTPUT" | grep -q "Fixed "; then
-          echo "::warning file=php-cs-fixer::Some code style issues were automatically fixed."
+          echo "::warning::Some code style issues were found by PHP-CS-Fixer (dry-run)."
+          echo "### 🧼 PHP-CS-Fixer Dry Run Issues" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
         fi
 
     - name: Check PSR Coding Standards
@@ -59,7 +67,11 @@ jobs:
         OUTPUT=$(vendor/bin/phpcs || true)
         echo "$OUTPUT"
         if echo "$OUTPUT" | grep -q "FOUND "; then
-          echo "::warning file=phpcs::Coding standard violations found. Please fix them."
+          echo "::warning::Coding standard violations found by PHPCS."
+          echo "### 📏 PHPCS Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
         fi
 
     - name: Run PHP Static Analysis with PHPStan
@@ -67,5 +79,9 @@ jobs:
         OUTPUT=$(vendor/bin/phpstan analyse || true)
         echo "$OUTPUT"
         if echo "$OUTPUT" | grep -q "Found "; then
-          echo "::warning file=phpstan::Static analysis issues found. Please review."
+          echo "::warning::Static analysis issues found by PHPStan."
+          echo "### 🔍 PHPStan Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
         fi
