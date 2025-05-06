@@ -8,4 +8,7 @@ abstract class Controller
     }
 
     public function demo2(){return False;}
+
+    public function demo3(){return False;}
+
 }
