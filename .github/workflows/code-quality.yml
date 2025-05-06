@@ -1,0 +1,46 @@
+name: Code Quality
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  php-code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mbstring, intl, zip, xml
+        coverage: none
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Check PHP syntax
+      run: |
+        find src tests -name "*.php" -print0 | xargs -0 -n1 php -l
+
+    - name: Check PSR Coding Standards
+      run: vendor/bin/phpcs
+
+    - name: Run PHP Static Analysis
+      run: vendor/bin/phpstan analyse
+
+    - name: Check code style with PHP-CS-Fixer
+      run: vendor/bin/php-cs-fixer fix --dry-run --diff
