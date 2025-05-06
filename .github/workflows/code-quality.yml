@@ -36,11 +36,18 @@ jobs:
       run: |
        find app config database routes tests -name "*.php" -print0 | xargs -0 -n1 php -l
 
+    - name: Fix PHP Code Style with PHPCBF
+      if: github.event_name == 'pull_request'
+      run: vendor/bin/phpcbf
+
+    - name: Fix code style with PHP-CS-Fixer
+      if: github.event_name == 'pull_request'
+      run: vendor/bin/php-cs-fixer fix
+
     - name: Check PSR Coding Standards
       run: vendor/bin/phpcs
 
     - name: Run PHP Static Analysis
       run: vendor/bin/phpstan analyse
 
-    - name: Check code style with PHP-CS-Fixer
-      run: vendor/bin/php-cs-fixer fix --dry-run --diff
+
