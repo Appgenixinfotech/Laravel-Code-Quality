@@ -8,10 +8,15 @@
     <!-- Paths to check -->
     <file>src</file>
     <file>tests</file>
+    <file>app</file>
+    <file>routes</file>
+    <file>config</file>
+    <file>database</file>
 
     <!-- Exclude some files -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/cache/*</exclude-pattern>
+    <exclude-pattern>node_modules</exclude-pattern>
 
     <!-- Show colors in console -->
     <arg name="colors"/>
