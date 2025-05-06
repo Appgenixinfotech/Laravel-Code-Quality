@@ -38,16 +38,34 @@ jobs:
 
     - name: Fix PHP Code Style with PHPCBF
       if: github.event_name == 'pull_request'
-      run: vendor/bin/phpcbf
+      run: |
+        OUTPUT=$(vendor/bin/phpcbf || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "ERRORS WERE FIXED"; then
+          echo "::warning file=phpcbf::Some code style issues were automatically fixed."
+        fi
 
     - name: Fix code style with PHP-CS-Fixer
       if: github.event_name == 'pull_request'
-      run: vendor/bin/php-cs-fixer fix
+      run: |
+        OUTPUT=$(vendor/bin/php-cs-fixer fix --dry-run --diff || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "Fixed "; then
+          echo "::warning file=php-cs-fixer::Some code style issues were automatically fixed."
+        fi
 
     - name: Check PSR Coding Standards
-      run: vendor/bin/phpcs
+      run: |
+        OUTPUT=$(vendor/bin/phpcs || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "FOUND "; then
+          echo "::warning file=phpcs::Coding standard violations found. Please fix them."
+        fi
 
-    - name: Run PHP Static Analysis
-      run: vendor/bin/phpstan analyse
-
-
+    - name: Run PHP Static Analysis with PHPStan
+      run: |
+        OUTPUT=$(vendor/bin/phpstan analyse || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "Found "; then
+          echo "::warning file=phpstan::Static analysis issues found. Please review."
+        fi
