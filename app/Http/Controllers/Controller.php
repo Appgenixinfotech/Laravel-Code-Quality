@@ -11,4 +11,7 @@ abstract class Controller
 
     public function demo3(){return False;}
 
+    public function demo4(){return False;}
+
+
 }
