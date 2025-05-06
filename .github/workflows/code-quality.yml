@@ -33,24 +33,55 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Check PHP syntax
-      continue-on-error: true
       run: |
        find app config database routes tests -name "*.php" -print0 | xargs -0 -n1 php -l
 
     - name: Fix PHP Code Style with PHPCBF
-      continue-on-error: true
       if: github.event_name == 'pull_request'
-      run: vendor/bin/phpcbf
+      run: |
+        OUTPUT=$(vendor/bin/phpcbf || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "ERRORS WERE FIXED"; then
+          echo "::warning::Some code style issues were automatically fixed by PHPCBF."
+          echo "### 🧹 PHPCBF Auto-Fix Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Fix code style with PHP-CS-Fixer
-      continue-on-error: true
       if: github.event_name == 'pull_request'
-      run: vendor/bin/php-cs-fixer fix
+      run: |
+        OUTPUT=$(vendor/bin/php-cs-fixer fix --dry-run --diff || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "Fixed "; then
+          echo "::warning::Some code style issues were found by PHP-CS-Fixer (dry-run)."
+          echo "### 🧼 PHP-CS-Fixer Dry Run Issues" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Check PSR Coding Standards
-      continue-on-error: true
-      run: vendor/bin/phpcs
+      run: |
+        OUTPUT=$(vendor/bin/phpcs || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "FOUND "; then
+          echo "::warning::Coding standard violations found by PHPCS."
+          echo "### 📏 PHPCS Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
 
-    - name: Run PHP Static Analysis
-      continue-on-error: true
-      run: vendor/bin/phpstan analyse
+    - name: Run PHP Static Analysis with PHPStan
+      run: |
+        OUTPUT=$(vendor/bin/phpstan analyse || true)
+        echo "$OUTPUT"
+        if echo "$OUTPUT" | grep -q "Found "; then
+          echo "::warning::Static analysis issues found by PHPStan."
+          echo "### 🔍 PHPStan Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "$OUTPUT" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
