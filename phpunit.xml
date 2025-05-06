@@ -4,24 +4,26 @@
          bootstrap="vendor/autoload.php"
          colors="true"
          verbose="true"
-         stopOnFailure="false"
          failOnWarning="true"
          failOnRisky="true">
 
     <testsuites>
-        <testsuite name="Feature Tests">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-        <testsuite name="Unit Tests">
-            <directory suffix="Test.php">./tests/Unit</directory>
+        <testsuite name="Laravel Test Suite">
+            <directory suffix="Test.php">./tests</directory>
         </testsuite>
     </testsuites>
 
     <coverage processUncoveredFiles="true">
         <include>
-            <directory suffix=".php">app</directory>
+            <directory suffix=".php">./app</directory>
         </include>
     </coverage>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">./app</directory>
+        </whitelist>
+    </filter>
 
     <php>
         <env name="APP_ENV" value="testing"/>
